@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Kasir Transparan</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h2 { text-align: center; }
+    .menu { margin: 20px; }
+    .btn { padding: 10px; margin: 5px; cursor: pointer; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #f2f2f2; }
+    .status-hijau { background: #b6fcb6; }
+    .status-putih { background: #fff; }
+    .status-merah { background: #fcb6b6; }
+  </style>
+</head>
+<body>
+  <h2>💳 Selamat Datang di Kasir Transparan</h2>
+
+  <!-- Menu Utama -->
+  <div class="menu">
+    <button class="btn" onclick="showBayar()">Bayar Tagihan</button>
+    <button class="btn" onclick="showLihat()">Lihat Tagihan</button>
+  </div>
+
+  <!-- Bayar Tagihan -->
+  <div id="bayar" style="display:none;">
+    <h3>Bayar Tagihan</h3>
+    <label>Nama: <input type="text" id="nama"></label><br>
+    <label>Kategori:
+      <select id="kategori">
+        <option value="Kas 15.000">Kas Rp15.000</option>
+        <option value="Kas 10.000">Kas Rp10.000</option>
+        <option value="Satgas">Denda Satgas (Rp5.000)</option>
+        <option value="Piket">Denda Piket Alpa (Rp15.000)</option>
+      </select>
+    </label><br>
+    <label>Nominal: <input type="number" id="nominal"></label><br>
+    <label>Metode Pembayaran:
+      <select id="metode">
+        <option value="QRIS">QRIS</option>
+        <option value="Cash">Cash</option>
+      </select>
+    </label><br>
+    <p><b>Mohon untuk kirim bukti pembayaran di sini!</b></p>
+    <input type="file" id="bukti"><br><br>
+    <button onclick="bayar()">Bayar</button>
+    <button onclick="backMenu()">Kembali</button>
+
+    <div id="qris" style="display:none;">
+      <h4>Scan QRIS untuk bayar</h4>
+      <img src="qris.png" alt="QRIS Code" width="200"><br>
+    </div>
+  </div>
+
+  <!-- Lihat Tagihan -->
+  <div id="lihat" style="display:none;">
+    <h3>Lihat Tagihan</h3>
+    <table id="laporan">
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Kategori</th>
+          <th>Nominal</th>
+          <th>Status</th>
+          <th>Tanggal Bayar</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button onclick="backMenu()">Kembali</button>
+  </div>
+
+  <script>
+    const laporan = [];
+
+    function showBayar(){ document.getElementById("bayar").style.display="block"; document.getElementById("lihat").style.display="none"; }
+    function showLihat(){ document.getElementById("lihat").style.display="block"; document.getElementById("bayar").style.display="none"; }
+    function backMenu(){ document.getElementById("bayar").style.display="none"; document.getElementById("lihat").style.display="none"; }
+
+    function bayar(){
+      const nama = document.getElementById("nama").value;
+      const kategori = document.getElementById("kategori").value;
+      const nominal = parseInt(document.getElementById("nominal").value);
+      const metode = document.getElementById("metode").value;
+      const tanggal = new Date().toLocaleString("id-ID");
+
+      let statusClass = "status-putih";
+      if(metode==="QRIS" || metode==="Cash"){ statusClass="status-hijau"; }
+
+      laporan.push({nama,kategori,nominal,statusClass,tanggal});
+
+      alert("Terima kasih sudah membayar tagihannya 😊");
+
+      document.getElementById("qris").style.display = (metode==="QRIS")?"block":"none";
+      updateTable();
+    }
+
+    function updateTable(){
+      const tbody = document.querySelector("#laporan tbody");
+      tbody.innerHTML="";
+      laporan.forEach(l=>{
+        const row=document.createElement("tr");
+        row.className=l.statusClass;
+        row.innerHTML=`<td>${l.nama}</td><td>${l.kategori}</td><td>Rp${l.nominal.toLocaleString()}</td><td>${l.statusClass==="status-hijau"?"Sudah Bayar":"Belum Bayar"}</td><td>${l.tanggal}</td>`;
+        tbody.appendChild(row);
+      });
+    }
+  </script>
+</body>
+</html>
